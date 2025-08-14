@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <title>Cadastro de Número</title>
+</head>
+<body>
+    <h1>Cadastre seu número</h1>
+
+    <form method="post" action="/cadastro/">
+        {% csrf_token %}
+        <label for="numero">Número de telefone (com código do país, ex: 5511999999999):</label><br>
+        <input type="text" name="numero" id="numero" required />
+        <br><br>
+        <button type="submit">Cadastrar</button>
+    </form>
+</body>
+</html>
