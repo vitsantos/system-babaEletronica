@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('upload.urls')),      # raiz vai para app upload
+    path("upload/", include("upload.urls")),
     path('cadastro/', include('cadastro.urls')),  # rota cadastro
 ]
 

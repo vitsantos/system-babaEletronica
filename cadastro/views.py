@@ -29,21 +29,19 @@ def enviar_template_whatsapp(numero):
 
     data = {
         "messaging_product": "whatsapp",
-        "to": numero,  # número no formato internacional, ex: "5511999999999"
+        "to": numero,  # número no formato "5511999999999"
         "type": "template",
         "template": {
-            "name": "nome_do_template_aprovado",  # Ex: "welcome_message"
+            "name": "nome_do_template_aprovado", 
             "language": {
                 "code": "pt_BR"
             },
-            # Se template tem parâmetros, pode colocar aqui:
-            # "components": [...]
+
         }
     }
 
     response = requests.post(url, headers=headers, json=data)
 
-    # Opcional: log do resultado
     print(response.status_code, response.json())
 
 

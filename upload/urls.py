@@ -1,9 +1,7 @@
 from django.urls import path
-from .views import ImageUploadView, upload_form
+from . import views
 
 urlpatterns = [
-    path('', upload_form, name='upload_form'),  # mostra o formulário
-    path('upload/', ImageUploadView.as_view(), name='image_upload'),  # recebe o POST com as imagens
+    path("", views.upload_form, name="upload_form"),   # rota da página inicial do app
+    path("stream/", views.stream_frame, name="stream_frame"),
 ]
-
-

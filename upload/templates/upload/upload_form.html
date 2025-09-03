@@ -1,40 +1,67 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Enviar Imagens</title>
-</head>
-<body>
-    <h1>Envie suas imagens</h1>
-    <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload/">
-        <input type="file" name="arquivo" multiple required />
-        <button type="submit">Enviar</button>
-    </form>
-     <pre id="response"></pre>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <title>Stream of Camera</title>
+    </head>
 
-    <script>
-    const form = document.getElementById('uploadForm');
-    const responseBox = document.getElementById('response');
+    <body>
+        <h1>Stream of Camera</h1>
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
+        <video id="video" autoplay playsinline width="640" height="480"></video> <!-- rodar sozinho, n forçar tela cheia -->
+        <br>
+        <button id="startBtn">Iniciar Captura</button>
+        <button id="stopBtn" disabled>Parar Captura</button>
 
-        const res = await fetch('/upload/', {
-            method: 'POST',
-            body: formData
-        });
+        <script>
+            const video = document.getElementById("video");
+            const startBtn = document.getElementById("startBtn");
+            const stopBtn = document.getElementById("stopBtn");
 
-        if (res.ok) {
-            // Upload ok, redireciona para a página de cadastro
-            window.location.href = '/cadastro/';
-        } else {
-            // Se der erro, mostra no pre
-            const json = await res.json();
-            responseBox.textContent = JSON.stringify(json, null, 2);
-        }
-    });
-    </script>
+            let stream = null;
+            let captureInterval = null;
 
-</body>
+            navigator.mediaDevices.getUserMedia({ video: true })
+            .then(s => {
+                stream = s;
+                video.srcObject = stream;
+            })
+            .catch(err => console.error("Erro ao acessar a câmera: ", err));
+
+            startBtn.addEventListener("click", () => {
+                if (!stream) return;
+
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+
+                captureInterval = setInterval(() => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    canvas.toBlob(blob => { 
+                    const formData = new FormData();
+                    formData.append("frame", blob, "frame.jpg");
+
+                    fetch("/upload/stream/", {
+                        method: "POST",
+                        body: formData
+                    });
+                    }, "image/jpeg", 0.7);
+                }, 5000); // ~0.5fps
+
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+            });
+
+            stopBtn.addEventListener("click", () => {
+                if (captureInterval) {
+                    clearInterval(captureInterval);
+                    captureInterval = null;
+                }
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            });
+        </script>
+    </body>
 </html>
